@@ -1,0 +1,184 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+}
+
+.echat-chatpane * {
+    font-family: Ariel, Helvetica, sans-serif;
+}
+
+.echat-chatpane {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 100px;
+    white-space: normal;
+    text-align: left;
+    background-color: #fff;
+    padding: 0;
+    margin: 0;
+}
+
+.echat-whoami {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 50px;
+    width: 50px;
+}
+
+.echat-whoami div {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-position: center;
+    background-size: 100%;
+    margin: 2px;
+    margin-right: 0;
+}
+
+.echat-editbox {
+    position: absolute;
+    padding: 0;
+    margin: 0;
+    bottom: 0;
+    left: 50px;
+    right: 128px;
+    height: 50px;
+}
+
+.echat-editbox div {
+    position: absolute;
+    padding: 0;
+    margin: 2px;
+    bottom: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.echat-editbox textarea {
+    position: absolute;
+    resize: none;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    height: 100%;
+    width: 100%;
+    padding: 2px;
+    outline: 0;
+    border: solid 1px #ddd;
+    border-radius: 2px;
+}
+
+.echat-sendbutton {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 128px;
+    height: 50px;
+}
+
+.echat-sendbutton div {
+    position: absolute;
+    padding: 0;
+    margin: 2px;
+    margin-left: 0px;
+    bottom: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
+.echat-sendbutton input {
+    position: absolute;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    background-color: #ccc;
+    border: solid 1px #ddd;
+    border-radius: 2px;
+    outline: 0;
+    cursor: pointer;
+}
+
+.echat-clientlist {
+    position: absolute;
+    width: 128px;
+    top: 0;
+    right: 0;
+    bottom: 50px;
+    overflow: auto;
+    background-color: #ddd;
+}
+
+.echat-client {
+    display: inline-block;
+    width: 32px;
+    height: 32px;
+    background-position: center;
+    background-size: 100%;
+}
+
+.echat-messagelog {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 128px;
+    bottom: 50px;
+    background-color: #fff;
+}
+
+.echat-log-client {
+    width: 16px;
+    height: 16px;
+    background-position: center;
+    background-size: 100%;
+}
+
+.echat-log-message {
+    position: relative;
+    white-space: pre-wrap;
+}
+
+.echat-log-message .echat-log-about {
+    float: left;
+    height: 16px;
+    width: 16px;
+    margin-bottom: 4px;
+    margin-right: 4px;
+    background-position: center;
+    background-size: 100%;
+}
+
+.echat-messagelog .echat-listitem {
+    padding: 5px;
+    border-bottom: solid 1px #ddd;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+
+.echat-listcontrol {
+    overflow: auto;
+}
+
+.ui-dialog-no-close .ui-dialog-titlebar-close {
+    display: none;
+}
+
+.echat-connect label {
+}
+
+.echat-connect textarea {
+    resize: none;
+}
