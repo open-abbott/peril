@@ -1,5 +1,4 @@
 var Http = require( "http" );
-var Identicon = require( "identicon" );
 var NodeStatic = require( "node-static" );
 var Socket = {
     IO: require( "socket.io" )
@@ -8,22 +7,6 @@ var Socket = {
 var port = 9001;
 
 var file_server = new NodeStatic.Server( "./public", { cache: false } );
-
-function generate_identicon( identity, callback ) {
-    Identicon.generate(
-        identity,
-        128,
-        function ( error, buffer ) {
-            if ( error ) {
-                console.log( "Error generating identicon: " + error.message );
-                console.log( error.stack );
-                console.trace( "Here!" );
-                return;
-            }
-            callback( buffer );
-        }
-    );
-}
 
 function generate_expiration() {
     var d = new Date();
@@ -34,10 +17,6 @@ function generate_expiration() {
 var server = Http.createServer(
     function ( request, response ) {
 
-        var server_pattern = {
-            identicon: /^\/identicon\/(.*)$/
-        };
-
         request.setEncoding( "utf8" );
 
         request.on( "end", function () {
@@ -45,27 +24,6 @@ var server = Http.createServer(
             console.log( "Request: " + request.url );
 
             switch ( true ) {
-            case server_pattern.identicon.test( request.url ):
-                var identity = ( server_pattern.identicon.exec( request.url ) )[1]
-                console.log( "Serving identicon for " + identity );
-                generate_identicon(
-                    identity,
-                    function ( buffer ) {
-                        response.writeHeader(
-                            200,
-                            {
-                                "Cache-Control": "public",
-                                "Content-Length": buffer.length,
-                                "Content-Type": "image/png",
-                                "Expires": generate_expiration(),
-                                "Pragma": "cache"
-                            }
-                        );
-                        response.write( buffer );
-                        response.end();
-                    }
-                );
-                break;
             default:
                 file_server.serve(
                     request,
