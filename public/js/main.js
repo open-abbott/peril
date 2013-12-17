@@ -36,5 +36,25 @@
         console.log( "Caught refresh event: " + JSON.stringify( data, null, 4 ) );
     } );
 
+    socket.on( "acquire", function () {
+        // emit territory to acquire
+    } );
+
+    socket.on( "deploy", function () {
+        // receive number of armies
+        // emit where the armies should go
+    } );
+
+    socket.on( "attack", function () {
+        // emit attack from and to
+    } );
+
+    socket.on( "defend", function () {
+        // emit count of defense dice
+    } );
+
+    socket.on( "fortify", function () {
+        // emit from/to pairs for moving armies
+    } );
 
 } )();

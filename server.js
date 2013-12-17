@@ -173,6 +173,29 @@ var Maps = {
     }
 };
 
+function CQueue() {
+    this.index = -1;
+    this.array = [];
+}
+CQueue.prototype.addItem = function ( item ) {
+    this.array.push( item );
+};
+CQueue.prototype.randomize = function () {
+    return;
+};
+CQueue.prototype.next = function () {
+    if ( 1 > this.array.length ) {
+        return null;
+    }
+
+    ++this.index;
+
+    if ( this.index >= this.array.length ) {
+        this.index = 0;
+    }
+
+    return this.array[this.index];
+};
 
 
 function Game( options ) {
@@ -180,20 +203,51 @@ function Game( options ) {
         playerCount: 6
     };
     this.board = Maps.Classic();
-    this.clients = [];
+    this.playerCount = 0;
+    this.clients = {};
+    this.playerQueue = null;
+    this.phase = this.Phase.Aquisition;
+    this.currentPlayer = null;
 }
-Game.prototype.addClient = function ( client, socket ) {
-    this.clients.push( client );
+Game.prototype.Phase = {
+    Aquisition: 0,
+    Deployment: 1,
+    Main: 2
+};
+Game.prototype.addClient = function ( client ) {
+    this.clients[client.getID()] = client;
 
-    if ( this.options.playerCount > this.clients.length ) {
+    if ( client.isObserver() || ( this.options.playerCount >= this.playerCount ) ) {
         return;
     }
 
-    this.start();
+    this.playerQueue.addItem( client );
+    ++this.playerCount;
+
+    if ( this.options.playerCount >= this.playerCount ) {
+        this.start();
+    }
 };
 Game.prototype.start = function () {
-    // do rolls to see who begins
-    // begin acquire phase
+    this.playerQueue.randomize();
+    this.step();
+};
+Game.prototype.step = function () {
+    this.currentPlayer = this.playerQueue.next();
+
+    switch ( this.phase ) {
+    case this.Phase.Main:
+        break;
+    case this.Phase.Deployment:
+        break;
+    case this.Phase.Aquisition:
+        break;
+    default:
+        break;
+    }
+
+};
+Game.prototype.refresh = function () {
 };
 
 
@@ -227,34 +281,37 @@ Client.prototype.toSerializable = function () {
 
 var Rooms = {
 
-    _db: {},
+    db: {},
 
     exists: function ( client ) {
-        return null != this._db[client.getID()];
+        return null != this.db[client.getID()];
     },
 
     join: function ( client ) {
 
         if ( !this.exists( client ) ) {
-            this._db[client.getID()] = {
+            this.db[client.getID()] = {
                 inRoom: {},
                 roomCount: 0
             };
         }
 
-        var entry = this._db[client.getID()];
+        var entry = this.db[client.getID()];
 
-        entry.inRoom[client.getRoom()] = true;
+        var room = client.getRoom();
+        entry.inRoom[room] = true;
         entry.roomCount++;
 
-        if ( null == Games[client.getRoom()] ) {
-            Games[client.getRoom()] = new Game();
-            Games[client.getRoom()].addClient( client );
+        if ( null == Games[room] ) {
+            Games[room] = new Game( {
+                room: room
+            } );
         }
+        Games[room].addClient( client );
     },
 
     part: function ( client ) {
-        var entry = this._db[client.getID()];
+        var entry = this.db[client.getID()];
 
         if ( null == entry ) {
             return;
@@ -266,7 +323,7 @@ var Rooms = {
 
         entry.roomCount--;
         if ( 1 > entry.roomCount ) {
-            delete this._db[client.getID()];
+            delete this.db[client.getID()];
         }
     },
 
@@ -274,7 +331,7 @@ var Rooms = {
         if ( !this.exists( client ) ) {
             return false;
         }
-        return this._db[client.getID()].inRoom[client.getRoom()] || false;
+        return this.db[client.getID()].inRoom[client.getRoom()] || false;
     }
 
 };
