@@ -92,17 +92,22 @@ io.sockets.on(
         } );
 
         socket.on( "refresh", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.refresh( socket.stash.client );
         } );
 
         // initial territory acquisition
         socket.on( "acquire", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.acquire( socket.stash.client, data.node );
+            game.refresh();
         } );
 
         // deploy spare armies before battle
         socket.on( "deploy", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( scoket.stash.client );
+            game.deploy( socket.stash.client, data.node );
+            game.refresh();
         } );
 
         // redeem card sets
@@ -111,16 +116,33 @@ io.sockets.on(
         } );
 
         socket.on( "attack", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.attack( {
+                client: socket.stash.client,
+                nodeFrom: data.from,
+                nodeTo: data.to,
+                diceCount: data.dice
+            } );
         } );
 
         socket.on( "defend", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.defend( {
+                client: socket.stash.client,
+                diceCount: data.dice
+            } );
+            game.refresh();
         } );
 
         // end of turn army arrangement
         socket.on( "fortify", function ( data ) {
-            //io.sockets.in( socket.stash.r ).emit( "update", update_data );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.fortify( {
+                client: socket.stash.client,
+                nodeFrom: data.from,
+                nodeTo: data.to
+            } );
+            game.refresh();
         } );
 
     }
