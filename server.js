@@ -2,7 +2,7 @@ var Http = require( "http" );
 var NodeStatic = require( "node-static" );
 var Peril = {}
 Peril.ClientFactory = require( "./lib/peril.client" );
-Peril.GameFactory = require( "./lib/peril.game" );
+Peril.Rooms = require( "./lib/peril.rooms" );
 var Socket = {};
 Socket.IO = require( "socket.io" );
 
@@ -10,12 +10,6 @@ Socket.IO = require( "socket.io" );
 var port = 9001;
 
 var file_server = new NodeStatic.Server( "./public", { cache: false } );
-
-function generate_expiration() {
-    var d = new Date();
-    d.setFullYear( d.getFullYear() + 1 );
-    return d.toUTCString();
-}
 
 var server = Http.createServer(
     function ( request, response ) {
@@ -43,70 +37,11 @@ var server = Http.createServer(
     }
 );
 
+
 server.listen( port );
 
 var io = Socket.IO.listen( server, { log: 1 } );
 io.set( "log level", 1 );
-
-var Games = {};
-
-var Rooms = {
-
-    db: {},
-
-    exists: function ( client ) {
-        return null != this.db[client.getID()];
-    },
-
-    join: function ( client ) {
-
-        if ( !this.exists( client ) ) {
-            this.db[client.getID()] = {
-                inRoom: {},
-                roomCount: 0
-            };
-        }
-
-        var entry = this.db[client.getID()];
-
-        var room = client.getRoom();
-        entry.inRoom[room] = true;
-        entry.roomCount++;
-
-        if ( null == Games[room] ) {
-            Games[room] = Peril.GameFactory.create( {
-                room: room
-            } );
-        }
-        Games[room].addClient( client );
-    },
-
-    part: function ( client ) {
-        var entry = this.db[client.getID()];
-
-        if ( null == entry ) {
-            return;
-        }
-
-        if ( null != entry.inRoom ) {
-            delete entry.inRoom[client.getRoom()];
-        }
-
-        entry.roomCount--;
-        if ( 1 > entry.roomCount ) {
-            delete this.db[client.getID()];
-        }
-    },
-
-    present: function ( client ) {
-        if ( !this.exists( client ) ) {
-            return false;
-        }
-        return this.db[client.getID()].inRoom[client.getRoom()] || false;
-    }
-
-};
-
 
 
 io.sockets.on(
@@ -127,7 +62,7 @@ io.sockets.on(
                 client: client
             };
 
-            if ( Rooms.present( client ) ) {
+            if ( Peril.Rooms.present( client ) ) {
                 var disconnected_data = {
                     message: "A client already exists with that identity"
                 };
@@ -137,7 +72,7 @@ io.sockets.on(
             }
 
             socket.join( socket.stash.client.getRoom() );
-            Rooms.join( client );
+            Peril.Rooms.join( client );
 
             var connected_data = socket.stash.client.toSerializable();
             console.log( "Emitting connected confirmation");
@@ -150,7 +85,7 @@ io.sockets.on(
                 return;
             }
 
-            Rooms.part( socket.stash.client );
+            Peril.Rooms.part( socket.stash.client );
                 
             // if game not over, concede
             // emit refresh
