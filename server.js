@@ -54,7 +54,7 @@ io.sockets.on(
             var client = Peril.ClientFactory.create( {
                 socket: socket,
                 id: data.id,
-                observer: !!data.observer,
+                observer: null == data.observer ? false : !!data.observer,
                 room: ( /^[a-z][-_a-z0-9]*$/ ).test( data.room || "" ) ? data.room : "top"
             } );
 
@@ -77,6 +77,8 @@ io.sockets.on(
             var connected_data = socket.stash.client.toSerializable();
             console.log( "Emitting connected confirmation");
             socket.emit( "connected", connected_data );
+
+            Peril.Rooms.game( socket.stash.client ).refresh( socket.stash.client );
         } );
 
         socket.on( "disconnect", function () {
