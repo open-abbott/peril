@@ -73,7 +73,7 @@ var Maps = {
                     bonus: 5
                 },
                 5: {
-                    name: "North America"
+                    name: "North America",
                     nodes: [ "50", "51", "52", "53", "54", "55", "56", "57" ],
                     bonus: 5
                 },
@@ -173,51 +173,113 @@ var Maps = {
     }
 };
 
-function Game() {
-    this.board = Maps.Classic();
-}
 
-var Clients = {
-    _db: {
-        "Server": {}
-    },
+
+function Game( options ) {
+    this.options = {
+        playerCount: 6
+    };
+    this.board = Maps.Classic();
+    this.clients = [];
+}
+Game.prototype.addClient = function ( client, socket ) {
+    this.clients.push( client );
+
+    if ( this.options.playerCount > this.clients.length ) {
+        return;
+    }
+
+    this.start();
+};
+Game.prototype.start = function () {
+    // do rolls to see who begins
+    // begin acquire phase
+};
+
+
+var Games = {};
+
+
+
+function Client( options ) {
+    this.options = options;
+}
+Client.prototype.getID = function () {
+    return this.options.id;
+};
+Client.prototype.getRoom = function () {
+    return this.options.room;
+};
+Client.prototype.isObserver = function () {
+    return this.options.observer;
+};
+Client.prototype.getSocket = function () {
+    return this.options.socket;
+};
+Client.prototype.toSerializable = function () {
+    return {
+        id: this.getID(),
+        room: this.getRoom()        
+    };
+};
+
+
+
+var Rooms = {
+
+    _db: {},
 
     exists: function ( client ) {
-        return null != this._db[client];
+        return null != this._db[client.getID()];
     },
 
-    join: function ( client, r ) {
+    join: function ( client ) {
+
         if ( !this.exists( client ) ) {
-            this._db[client] = {
-                r: {},
-                r_count: 0
+            this._db[client.getID()] = {
+                inRoom: {},
+                roomCount: 0
             };
         }
-        this._db[client].r[r] = true;
-        this._db[client].r_count++;
+
+        var entry = this._db[client.getID()];
+
+        entry.inRoom[client.getRoom()] = true;
+        entry.roomCount++;
+
+        if ( null == Games[client.getRoom()] ) {
+            Games[client.getRoom()] = new Game();
+            Games[client.getRoom()].addClient( client );
+        }
     },
 
-    part: function ( client, r ) {
-        if ( null == this._db[client] ) {
+    part: function ( client ) {
+        var entry = this._db[client.getID()];
+
+        if ( null == entry ) {
             return;
         }
-        if ( null != this._db[client].r ) {
-            delete this._db[client].r[r];
+
+        if ( null != entry.inRoom ) {
+            delete entry.inRoom[client.getRoom()];
         }
-        this._db[client].r_count--;
-        if ( 1 > this._db[client].r_count ) {
-            delete this._db[client];
+
+        entry.roomCount--;
+        if ( 1 > entry.roomCount ) {
+            delete this._db[client.getID()];
         }
     },
 
-    isIn: function ( client, r ) {
+    present: function ( client ) {
         if ( !this.exists( client ) ) {
             return false;
         }
-        return this._db[client].r[r] || false;
+        return this._db[client.getID()].inRoom[client.getRoom()] || false;
     }
 
 };
+
+
 
 io.sockets.on(
     "connection",
@@ -226,47 +288,32 @@ io.sockets.on(
         socket.on( "connect", function ( data ) {
             console.log( "Received connect: " + JSON.stringify( data ) );
 
+            var client = new Client( {
+                socket: socket,
+                id: data.id,
+                observer: !!data.observer,
+                room: ( /^[a-z][-_a-z0-9]*$/ ).test( data.room || "" ) ? data.room : "top"
+            } );
+
             socket.stash = {
-                client: data.client,
-                r: ( /^[a-z][-_a-z0-9]*$/ ).test( data.r || "" ) ? data.r : "top"
+                client: client
             };
 
-            console.log( "socket.stash: " + JSON.stringify( socket.stash ) );
-
-            if ( Clients.isIn( socket.stash.client, socket.stash.r ) ) {
+            if ( Rooms.present( client ) ) {
                 var disconnected_data = {
                     message: "A client already exists with that identity"
                 };
-                console.log( "Disconnecting duplicate client " + socket.stash.client );
+                console.log( "Disconnecting duplicate client " + socket.stash.client.getID() );
                 socket.emit( "disconnected", disconnected_data );
                 return;
             }
 
-            socket.join( socket.stash.g );
-            Clients.join( socket.stash.client, socket.stash.r );
+            socket.join( socket.stash.client.getRoom() );
+            Rooms.join( client );
 
-            var connected_data = {
-                client: socket.stash.client,
-                r: socket.stash.r
-            };
+            var connected_data = socket.stash.client.toSerializable();
             console.log( "Emitting connected confirmation");
             socket.emit( "connected", connected_data );
-
-            var update_data = {
-                client: "Server",
-                action: "connect",
-                payload: {
-                    client: socket.stash.client,
-                    r: socket.stash.r
-                }
-            };
-            console.log( "Emitting update: " + JSON.stringify( update_data ) );
-            socket.broadcast.to( socket.stash.r ).emit( "update", update_data );
-
-            console.log( "Emitting refresh" );
-            io.sockets
-                .in( socket.stash.r )
-                .emit( "refresh", Clients.rCensus( socket.stash.r ) );
         } );
 
         socket.on( "disconnect", function () {
@@ -275,23 +322,10 @@ io.sockets.on(
                 return;
             }
 
-            Clients.part( socket.stash.client, socket.stash.r );
+            Rooms.part( socket.stash.client );
                 
-            console.log( "Emitting refresh" );
-            io.sockets
-                .in( socket.stash.r )
-                .emit( "refresh", Clients.rCensus( socket.stash.r ) );
-
-            var update_data = {
-                client: "Server",
-                action: "disconnect",
-                payload: {
-                    client: socket.stash.client,
-                    r: socket.stash.r
-                }
-            };
-            console.log( "Emitting update: " + JSON.stringify( update_data ) );
-            socket.broadcast.to( socket.stash.r ).emit( "update", update_data );
+            // if game not over, concede
+            // emit refresh
         } );
 
         socket.on( "refresh", function ( data ) {
