@@ -136,6 +136,18 @@ io.sockets.on(
             game.refresh();
         } );
 
+        // successful capture of node
+        socket.on( "occupy", function ( data ) {
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.occupy( {
+                client: socket.stash.client,
+                nodeFrom: data.from,
+                nodeTo: data.to,
+                armies: data.armies
+            } );
+            game.refresh();
+        } );
+
         // end of turn army arrangement
         socket.on( "fortify", function ( data ) {
             var game = Peril.Rooms.game( socket.stash.client );
