@@ -3,13 +3,10 @@
   <head>
     <link href="css/main.css" rel="stylesheet" type="text/css" />
     <script src="/socket.io/socket.io.js" type="text/javascript"></script>
-    <script src="js/angular.min.js" type="text/javascript"></script>
+    <script src="js/angular.js" type="text/javascript"></script>
+    <script src="js/angular-route.js" type="text/javascript"></script>
     <script src="js/main.js" type="text/javascript"></script>
     <title>Peril 0.0.1</title>
   </head>
-  <body>
-
-    <peril-map></peril-map>
-
-  </body>
+  <body ng-view></body>
 </html>
