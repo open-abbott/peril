@@ -1,3 +1,4 @@
+/*
 ( function () {
 
     var url_parameters = ( function ( url_parameters ) {
@@ -58,3 +59,25 @@
     } );
 
 } )();
+*/
+
+var Module = angular.module(
+    "peril",
+    []
+).config( function ( $httpProvider ) {
+    delete $httpProvider.defaults.headers.common["X-Requested-With"];
+} ).directive(
+    "perilMap",
+    [ function () {
+
+        return {
+            restrict: "E",
+            scope: {},
+            controller: function ( $scope ) {
+            },
+            templateUrl: "template.partial",
+            replace: true
+        };
+
+    } ]
+);
