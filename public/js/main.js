@@ -1,130 +1,334 @@
 ( function () {
 
+    function Connection() {
+
+        this.id = null;
+        this.room = null;
+        this.host = "http://daveabbott.com:9001";
+        this.socket = null;
+        this.listeners = {};
+    };
+
+    Connection.prototype.createSocket = function () {
+
+        var my = this;
+
+        this.socket = io.connect( this.host );
+
+        this.socket.on( "connected", function ( data ) {
+            //document.title = "Peril [" + data.room + ":" + data.id + "]";
+            my.listeners.connected && my.listeners.connected.apply( null, arguments );
+        } );
+
+        this.socket.on( "disconnected", function ( data ) {
+            console.log( "disconnected" );
+        } );
+
+        this.socket.on( "refresh", function ( data ) {
+            console.log( "Caught refresh event: " + JSON.stringify( data, null, 4 ) );
+        } );
+
+        this.socket.on( "acquire", function () {
+            // emit territory to acquire
+        } );
+
+        this.socket.on( "deploy", function () {
+            // receive number of armies
+            // emit where the armies should go
+        } );
+
+        this.socket.on( "attack", function () {
+            // emit attack from and to
+        } );
+
+        this.socket.on( "defend", function () {
+            // emit count of defense dice
+        } );
+
+        this.socket.on( "fortify", function () {
+            // emit from/to pairs for moving armies
+        } );
+
+    };
+
+    Connection.prototype.open = function ( options ) {
+
+        console.log( "Attempting to open as: " + JSON.stringify( options ) );
+
+        this.id = options.id;
+        this.room = options.room;
+
+        var connect_data = {
+            id: this.id,
+            room: this.room
+        };
+
+        this.createSocket();
+        this.socket.emit( "connect", connect_data );
+
+    };
+
+    Connection.prototype.setListener = function ( name, callback ) {
+        this.listeners[name] = callback;
+    };
+
+
     var Peril = {};
 
+    Peril.Connection = new Connection();
+
     Peril.SignIn = {};
-    Peril.SignIn.Controller = function ( $scope, $route ) {
-        
+    Peril.SignIn.Controller = function ( $scope, $location ) {
+
+        console.log( "Starting SignIn controller" );
+
+        var my = this;
+
+        $scope.id = "";
+        $scope.room = "";
+
+        $scope.connect = function () {
+            Peril.Connection.open( {
+                id: $scope.id,
+                room: $scope.room
+            } );
+        };
+
+        this.reroute = function ( path ) {
+            console.log( "Rerouting to " + path );
+            $location.path( path );
+        };
+
+        Peril.Connection.setListener( "connected", function ( data ) {
+            my.reroute( "/" + [ data.room, data.id ].join( "/" ) );
+        } );
+
     };
 
     Peril.Room = {};
     Peril.Room.Controller = function ( $scope, $route ) {
     };
 
-    Peril.Map = {};
+    Peril.Map = {
 
-    Peril.Map.Anchors = {
+        width: 540,
+        height: 315,
+       
+        clusters: {
 
-        "10": [ 249, 285 ],
-        "11": [ 215, 257 ],
-        "12": [ 257, 245 ],
-        "13": [ 254, 207 ],
-        "14": [ 289, 272 ],
-        "15": [ 208, 209 ],
+            "0": {
+                id: 0,
+                nodes: {
+                    "25": { id: "01", a: [   0,  50 ], r: 0 },
+                    "50": { id: "02", a: [ 540,  66 ], r: 0 }
+                }
+            },
 
-        "20": [ 336, 152 ],
-        "21": [ 405, 163 ],
-        "22": [ 354, 200 ],
-        "23": [ 471,  96 ],
-        "24": [ 518, 133 ],
-        "25": [ 516,  66 ],
-        "26": [ 303, 196 ],
-        "27": [ 471, 149 ],
-        "28": [ 396, 219 ],
-        "29": [ 426, 105 ],
-        "2a": [ 371,  96 ],
-        "2b": [ 457,  52 ],
+            "1": {
+                id: 1,
+                nodes: {
+                    "10": { id: "10", a: [ 249, 285 ], r: 15 },
+                    "11": { id: "11", a: [ 215, 257 ], r: 15 },
+                    "12": { id: "12", a: [ 257, 245 ], r: 15 },
+                    "13": { id: "13", a: [ 254, 207 ], r: 15 },
+                    "14": { id: "14", a: [ 289, 272 ], r: 20 },
+                    "15": { id: "15", a: [ 208, 209 ], r: 25 }
+                }
+            },
 
-        "30": [ 495, 271 ],
-        "31": [ 446, 226 ],
-        "32": [ 485, 228 ],
-        "33": [ 449, 267 ],
+            "2": {
+                id: 2,
+                nodes: {
+                    "20": { id: "20", a: [ 336, 152 ], r: 25 },
+                    "21": { id: "21", a: [ 405, 163 ], r: 35 },
+                    "22": { id: "22", a: [ 354, 200 ], r: 15 },
+                    "23": { id: "23", a: [ 471,  96 ], r: 19 },
+                    "24": { id: "24", a: [ 518, 133 ], r: 10 },
+                    "25": { id: "25", a: [ 516,  66 ], r: 20 },
+                    "26": { id: "26", a: [ 303, 196 ], r: 15 },
+                    "27": { id: "27", a: [ 471, 149 ], r: 26 },
+                    "28": { id: "28", a: [ 396, 219 ], r: 15 },
+                    "29": { id: "29", a: [ 426, 105 ], r: 20 },
+                    "2a": { id: "2a", a: [ 371,  96 ], r: 29 },
+                    "2b": { id: "2b", a: [ 457,  52 ], r: 20 }
+                }
+            },
 
-        "40": [ 199, 129 ],
-        "41": [ 183,  93 ],
-        "42": [ 249, 125 ],
-        "43": [ 238,  69 ],
-        "44": [ 273, 164 ],
-        "45": [ 300,  92 ],
-        "46": [ 218, 160 ],
+            "3": {
+                id: 3,
+                nodes: {
+                    "30": { id: "30", a: [ 495, 271 ], r: 20 },
+                    "31": { id: "31", a: [ 446, 226 ], r: 15 },
+                    "32": { id: "32", a: [ 485, 228 ], r: 15 },
+                    "33": { id: "33", a: [ 449, 267 ], r: 15 }
+                }
+            },
 
-        "50": [  26,  50 ],
-        "51": [  47,  92 ],
-        "52": [  83, 164 ],
-        "53": [ 112, 130 ],
-        "54": [ 137,  47 ],
-        "55": [  76,  54 ],
-        "56": [  91,  96 ],
-        "57": [ 132,  97 ],
-        "58": [  66, 127 ],
+            "4": {
+                id: 4,
+                nodes: {
+                    "40": { id: "40", a: [ 199, 129 ], r: 11 },
+                    "41": { id: "41", a: [ 183,  93 ], r: 15 },
+                    "42": { id: "42", a: [ 249, 125 ], r: 20 },
+                    "43": { id: "43", a: [ 238,  69 ], r: 29 },
+                    "44": { id: "44", a: [ 273, 164 ], r: 18 },
+                    "45": { id: "45", a: [ 300,  92 ], r: 30 },
+                    "46": { id: "46", a: [ 218, 160 ], r: 15 }
+                }
+            },
 
-        "60": [  97, 280 ],
-        "61": [ 116, 243 ],
-        "62": [  76, 246 ],
-        "63": [  92, 206 ]
+            "5": {
+                id: 5,
+                nodes: {
+                    "50": { id: "50", a: [  26,  50 ], r: 20 },
+                    "51": { id: "51", a: [  47,  92 ], r: 15 },
+                    "52": { id: "52", a: [  83, 164 ], r: 20 },
+                    "53": { id: "53", a: [ 112, 130 ], r: 15 },
+                    "54": { id: "54", a: [ 137,  47 ], r: 28 },
+                    "55": { id: "55", a: [  76,  54 ], r: 20 },
+                    "56": { id: "56", a: [  91,  96 ], r: 15 },
+                    "57": { id: "57", a: [ 132,  97 ], r: 15 },
+                    "58": { id: "58", a: [  66, 127 ], r: 15 }
+                }
+            },
+
+            "6": {
+                id: 6,
+                nodes: {
+                    "60": { id: "60", a: [  97, 280 ], r: 15 },
+                    "61": { id: "61", a: [ 116, 243 ], r: 20 },
+                    "62": { id: "62", a: [  76, 246 ], r: 15 },
+                    "63": { id: "63", a: [  92, 206 ], r: 15 }
+                }
+            }
+
+        },
+
+        edges: [
+            { a: { c: "1", n: "10" }, b: { c: "1", n:"14" } },
+            { a: { c: "1", n: "10" }, b: { c: "1", n:"12" } },
+            { a: { c: "1", n: "10" }, b: { c: "1", n:"11" } },
+
+            { a: { c: "1", n: "11" }, b: { c: "1", n:"12" } },
+            { a: { c: "1", n: "11" }, b: { c: "1", n:"15" } },
+
+            { a: { c: "1", n: "12" }, b: { c: "1", n:"13" } },
+            { a: { c: "1", n: "12" }, b: { c: "1", n:"14" } },
+            { a: { c: "1", n: "12" }, b: { c: "1", n:"15" } },
+            { a: { c: "1", n: "12" }, b: { c: "2", n:"26" } },
+
+            { a: { c: "1", n: "13" }, b: { c: "1", n:"15" } },
+            { a: { c: "1", n: "13" }, b: { c: "2", n:"26" } },
+            { a: { c: "1", n: "13" }, b: { c: "4", n:"44" } },
+
+            { a: { c: "1", n: "15" }, b: { c: "4", n:"44" } },
+            { a: { c: "1", n: "15" }, b: { c: "4", n:"46" } },
+            { a: { c: "1", n: "15" }, b: { c: "6", n:"61" } },
+
+            { a: { c: "2", n: "20" }, b: { c: "2", n:"21" } },
+            { a: { c: "2", n: "20" }, b: { c: "2", n:"22" } },
+            { a: { c: "2", n: "20" }, b: { c: "2", n:"26" } },
+            { a: { c: "2", n: "20" }, b: { c: "2", n:"2a" } },
+            { a: { c: "2", n: "20" }, b: { c: "4", n:"45" } },
+
+            { a: { c: "2", n: "21" }, b: { c: "2", n:"22" } },
+            { a: { c: "2", n: "21" }, b: { c: "2", n:"27" } },
+            { a: { c: "2", n: "21" }, b: { c: "2", n:"28" } },
+            { a: { c: "2", n: "21" }, b: { c: "2", n:"29" } },
+            { a: { c: "2", n: "21" }, b: { c: "2", n:"2a" } },
+
+            { a: { c: "2", n: "22" }, b: { c: "2", n:"26" } },
+            { a: { c: "2", n: "22" }, b: { c: "2", n:"28" } },
+
+            { a: { c: "2", n: "23" }, b: { c: "2", n:"25" } },
+            { a: { c: "2", n: "23" }, b: { c: "2", n:"27" } },
+            { a: { c: "2", n: "23" }, b: { c: "2", n:"29" } },
+            { a: { c: "2", n: "23" }, b: { c: "2", n:"2b" } },
+
+            { a: { c: "2", n: "24" }, b: { c: "2", n:"25" } },
+            { a: { c: "2", n: "24" }, b: { c: "2", n:"27" } },
+
+            { a: { c: "2", n: "25" }, b: { c: "2", n:"27" } },
+            { a: { c: "2", n: "25" }, b: { c: "2", n:"2b" } },
+            { a: { c: "2", n: "25" }, b: { c: "0", n:"50" } },
+
+            { a: { c: "2", n: "26" }, b: { c: "4", n:"44" } },
+            { a: { c: "2", n: "26" }, b: { c: "4", n:"45" } },
+
+            { a: { c: "2", n: "27" }, b: { c: "2", n:"29" } },
+
+            { a: { c: "2", n: "28" }, b: { c: "3", n:"31" } },
+
+            { a: { c: "2", n: "29" }, b: { c: "2", n:"2a" } },
+            { a: { c: "2", n: "29" }, b: { c: "2", n:"2b" } },
+
+            { a: { c: "2", n: "2a" }, b: { c: "4", n:"45" } },
+
+            { a: { c: "3", n: "30" }, b: { c: "3", n:"32" } },
+            { a: { c: "3", n: "30" }, b: { c: "3", n:"33" } },
+
+            { a: { c: "3", n: "31" }, b: { c: "3", n:"32" } },
+            { a: { c: "3", n: "31" }, b: { c: "3", n:"33" } },
+
+            { a: { c: "3", n: "32" }, b: { c: "3", n:"33" } },
+
+            { a: { c: "4", n: "40" }, b: { c: "4", n:"41" } },
+            { a: { c: "4", n: "40" }, b: { c: "4", n:"42" } },
+            { a: { c: "4", n: "40" }, b: { c: "4", n:"43" } },
+            { a: { c: "4", n: "40" }, b: { c: "4", n:"46" } },
+
+            { a: { c: "4", n: "41" }, b: { c: "4", n:"43" } },
+            { a: { c: "4", n: "41" }, b: { c: "5", n:"54" } },
+
+            { a: { c: "4", n: "42" }, b: { c: "4", n:"43" } },
+            { a: { c: "4", n: "42" }, b: { c: "4", n:"44" } },
+            { a: { c: "4", n: "42" }, b: { c: "4", n:"45" } },
+            { a: { c: "4", n: "42" }, b: { c: "4", n:"46" } },
+
+            { a: { c: "4", n: "43" }, b: { c: "4", n:"45" } },
+
+            { a: { c: "4", n: "44" }, b: { c: "4", n:"45" } },
+            { a: { c: "4", n: "44" }, b: { c: "4", n:"46" } },
+
+            { a: { c: "5", n: "50" }, b: { c: "5", n:"51" } },
+            { a: { c: "5", n: "50" }, b: { c: "5", n:"55" } },
+            { a: { c: "5", n: "50" }, b: { c: "0", n:"25" } },
+
+            { a: { c: "5", n: "51" }, b: { c: "5", n:"55" } },
+            { a: { c: "5", n: "51" }, b: { c: "5", n:"56" } },
+            { a: { c: "5", n: "51" }, b: { c: "5", n:"58" } },
+
+            { a: { c: "5", n: "52" }, b: { c: "5", n:"53" } },
+            { a: { c: "5", n: "52" }, b: { c: "5", n:"58" } },
+            { a: { c: "5", n: "52" }, b: { c: "6", n:"63" } },
+
+            { a: { c: "5", n: "53" }, b: { c: "5", n:"56" } },
+            { a: { c: "5", n: "53" }, b: { c: "5", n:"57" } },
+            { a: { c: "5", n: "53" }, b: { c: "5", n:"58" } },
+
+            { a: { c: "5", n: "54" }, b: { c: "5", n:"55" } },
+            { a: { c: "5", n: "54" }, b: { c: "5", n:"56" } },
+            { a: { c: "5", n: "54" }, b: { c: "5", n:"57" } },
+
+            { a: { c: "5", n: "55" }, b: { c: "5", n:"56" } },
+
+            { a: { c: "5", n: "56" }, b: { c: "5", n:"57" } },
+            { a: { c: "5", n: "56" }, b: { c: "5", n:"58" } },
+
+            { a: { c: "6", n: "60" }, b: { c: "6", n:"61" } },
+            { a: { c: "6", n: "60" }, b: { c: "6", n:"62" } },
+
+            { a: { c: "6", n: "61" }, b: { c: "6", n:"62" } },
+            { a: { c: "6", n: "61" }, b: { c: "6", n:"63" } },
+
+            { a: { c: "6", n: "62" }, b: { c: "6", n:"63" } }
+        ]
 
     };
 
     Peril.Map.Controller = function ( $scope ) {
 
-        $scope.anchors = Peril.Map.Anchors;
-
-        var url_parameters = ( function ( url_parameters ) {
-            var params = {};
-            if ( "" == url_parameters ) return params;
-            for ( var i = 0; i < url_parameters.length; ++i ) {
-                var pair = url_parameters[i].split( "=" );
-                if ( 2 != pair.length ) continue;
-                params[pair[0]] = decodeURIComponent( pair[1].replace( /\+/g, " " ) );
-            }
-            return params;
-        } )( window.location.search.substr( 1 ).split( "&" ) );
-
-
-        var host = "http://daveabbott.com:9001";
-        var socket = io.connect( host );
-
-
-        var connect_data = {
-            id: url_parameters.c,
-            room: url_parameters.r
-        };
-        socket.emit( "connect", connect_data );
-
-
-        socket.on( "connected", function ( data ) {
-            document.title = "Peril [" + data.room + ":" + data.id + "]";
-        } );
-
-        socket.on( "disconnected", function ( data ) {
-            alert( data.message );
-            window.location.reload( true );
-        } );
-
-        socket.on( "refresh", function ( data ) {
-            console.log( "Caught refresh event: " + JSON.stringify( data, null, 4 ) );
-        } );
-
-        socket.on( "acquire", function () {
-            // emit territory to acquire
-        } );
-
-        socket.on( "deploy", function () {
-            // receive number of armies
-            // emit where the armies should go
-        } );
-
-        socket.on( "attack", function () {
-            // emit attack from and to
-        } );
-
-        socket.on( "defend", function () {
-            // emit count of defense dice
-        } );
-
-        socket.on( "fortify", function () {
-            // emit from/to pairs for moving armies
-        } );
+        $scope.map = Peril.Map;
 
     };
 
