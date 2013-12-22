@@ -48,6 +48,7 @@ io.sockets.on(
     "connection",
     function ( socket ) {
 
+        // connect and join need broken apart
         socket.on( "connect", function ( data ) {
             console.log( "Received connect: " + JSON.stringify( data ) );
 
@@ -62,6 +63,7 @@ io.sockets.on(
                 client: client
             };
 
+            // instead of dumping, just increment user id
             if ( Peril.Rooms.present( client ) ) {
                 var disconnected_data = {
                     message: "A client already exists with that identity"
