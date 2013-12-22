@@ -55,8 +55,9 @@ io.sockets.on(
             var client = Peril.ClientFactory.create( {
                 socket: socket,
                 id: data.id,
-                observer: null == data.observer ? false : !!data.observer,
-                room: ( /^[a-z][-_a-z0-9]*$/ ).test( data.room || "" ) ? data.room : "top"
+                room: data.room,
+                observer: data.observer,
+                playerCount: data.playerCount
             } );
 
             socket.stash = {
@@ -113,7 +114,7 @@ io.sockets.on(
         socket.on( "deploy", function ( data ) {
             console.log( "Received deploy: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( scoket.stash.client );
-            game.deploy( socket.stash.client, data.node );
+            game.deploy( socket.stash.client, data.node, data.armies );
             game.refresh();
         } );
 
