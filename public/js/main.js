@@ -1,9 +1,6 @@
 ( function () {
 
     function Connection() {
-
-        this.id = null;
-        this.room = null;
         this.host = "http://daveabbott.com:9001";
         this.socket = null;
         this.listeners = {};
@@ -42,16 +39,8 @@
 
         console.log( "Attempting to open as: " + JSON.stringify( options ) );
 
-        this.id = options.id;
-        this.room = options.room;
-
-        var connect_data = {
-            id: this.id,
-            room: this.room
-        };
-
         this.createSocket();
-        this.socket.emit( "connect", connect_data );
+        this.socket.emit( "connect", options );
 
     };
 
@@ -73,6 +62,7 @@
 
         $scope.id = "";
         $scope.room = "";
+        $scope.observer = false;
         $scope.navigateTo = null;
 
         $scope.$watch( "navigateTo", function () {
@@ -97,7 +87,8 @@
 
             Peril.Connection.open( {
                 id: $scope.id,
-                room: $scope.room
+                room: $scope.room,
+                observer: $scope.observer
             } );
 
         };
