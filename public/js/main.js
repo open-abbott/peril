@@ -286,6 +286,7 @@
         $scope.id = "";
         $scope.room = "";
         $scope.observer = false;
+        $scope.playerCount = 2;
         $scope.navigateTo = null;
 
         $scope.$watch( "navigateTo", function () {
@@ -311,7 +312,8 @@
             Peril.Connection.open( {
                 id: $scope.id,
                 room: $scope.room,
-                observer: $scope.observer
+                observer: $scope.observer,
+                playerCount: Number( $scope.playerCount )
             } );
 
         };

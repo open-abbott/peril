@@ -1,8 +1,10 @@
 var Http = require( "http" );
 var NodeStatic = require( "node-static" );
+
 var Peril = {}
 Peril.ClientFactory = require( "./lib/peril.client" );
 Peril.Rooms = require( "./lib/peril.rooms" );
+
 var Socket = {};
 Socket.IO = require( "socket.io" );
 
@@ -107,7 +109,6 @@ io.sockets.on(
             console.log( "Received acquire: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.acquire( socket.stash.client, data.node );
-            game.refresh();
         } );
 
         // deploy spare armies before battle
@@ -115,7 +116,6 @@ io.sockets.on(
             console.log( "Received deploy: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( scoket.stash.client );
             game.deploy( socket.stash.client, data.node, data.armies );
-            game.refresh();
         } );
 
         // redeem card sets
@@ -142,7 +142,6 @@ io.sockets.on(
                 client: socket.stash.client,
                 diceCount: data.dice
             } );
-            game.refresh();
         } );
 
         // successful capture of node
@@ -155,7 +154,6 @@ io.sockets.on(
                 nodeTo: data.to,
                 armies: data.armies
             } );
-            game.refresh();
         } );
 
         // end of turn army arrangement
@@ -167,7 +165,6 @@ io.sockets.on(
                 nodeFrom: data.from,
                 nodeTo: data.to
             } );
-            game.refresh();
         } );
 
     }

@@ -12,6 +12,15 @@
       <label>As observer</label>
       <input ng-model="observer" type="checkbox" />
 
+      <div ng-if="!observer">
+        <label>Player count</label>
+        <input
+           ng-model="playerCount"
+           ng-minlength="1",
+           ng-pattern="/^\d+$/"
+           type="text" />
+      </div>
+
       <div class="button-set">
         <button ng-click="connect()">Connect</button>
       </div>
