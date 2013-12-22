@@ -20,7 +20,8 @@
             "deploy",       // receive number of armies, emit where the armies should go
             "attack",       // emit attack from and to
             "defend",       // emit count of defense dice
-            "fortify"       // emit from/to pairs for moving armies
+            "fortify",      // emit from/to pairs for moving armies
+            "gameOver"
         ];
 
         function make_event_handler( name ) {
