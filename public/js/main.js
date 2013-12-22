@@ -15,40 +15,27 @@
 
         this.socket = io.connect( this.host );
 
-        this.socket.on( "connected", function ( data ) {
-            //document.title = "Peril [" + data.room + ":" + data.id + "]";
-            my.listeners.connected && my.listeners.connected.apply( null, arguments );
-        } );
+        var events = [
+            "connected",
+            "disconnected",
+            "refresh",
+            "acquire",      // emit territory to acquire
+            "deploy",       // receive number of armies, emit where the armies should go
+            "attack",       // emit attack from and to
+            "defend",       // emit count of defense dice
+            "fortify"       // emit from/to pairs for moving armies
+        ];
 
-        this.socket.on( "disconnected", function ( data ) {
-            console.log( "disconnected" );
-        } );
+        function make_event_handler( name ) {
+            return function () {
+                console.log( "Client event received: " + name );
+                my.listeners[name] && my.listeners[name].apply( null, arguments );
+            };
+        }
 
-        this.socket.on( "refresh", function ( data ) {
-            console.log( "Caught refresh event: " + JSON.stringify( data, null, 4 ) );
-        } );
-
-        this.socket.on( "acquire", function () {
-            // emit territory to acquire
-        } );
-
-        this.socket.on( "deploy", function () {
-            // receive number of armies
-            // emit where the armies should go
-        } );
-
-        this.socket.on( "attack", function () {
-            // emit attack from and to
-        } );
-
-        this.socket.on( "defend", function () {
-            // emit count of defense dice
-        } );
-
-        this.socket.on( "fortify", function () {
-            // emit from/to pairs for moving armies
-        } );
-
+        for ( var i = 0; i < events.length; ++i ) {
+            this.socket.on( events[i], make_event_handler( events[i] ) );
+        }
     };
 
     Connection.prototype.open = function ( options ) {
@@ -86,22 +73,34 @@
 
         $scope.id = "";
         $scope.room = "";
+        $scope.navigateTo = null;
+
+        $scope.$watch( "navigateTo", function () {
+            if ( null != $scope.navigateTo ) {
+                $location.path( $scope.navigateTo );
+            }
+        } );
+
+        $scope.$on( "$locationChangeStart", function ( event, newUrl, oldUrl ) {
+
+            console.log( "Navigating from " + oldUrl + " to " + newUrl );
+
+        } );
 
         $scope.connect = function () {
+
+            Peril.Connection.setListener( "connected", function ( data ) {
+                console.log( "Attempting to reroute..." );
+                $scope.navigateTo = "/" + [ data.room, data.id ].join( "/" );
+                $scope.$apply();
+            } );
+
             Peril.Connection.open( {
                 id: $scope.id,
                 room: $scope.room
             } );
-        };
 
-        this.reroute = function ( path ) {
-            console.log( "Rerouting to " + path );
-            $location.path( path );
         };
-
-        Peril.Connection.setListener( "connected", function ( data ) {
-            my.reroute( "/" + [ data.room, data.id ].join( "/" ) );
-        } );
 
     };
 
