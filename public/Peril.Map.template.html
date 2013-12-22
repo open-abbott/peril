@@ -68,6 +68,8 @@
 
       <circle
          ng-repeat="node in cluster.nodes"
+         ng-click="nodeAction( node.id )"
+         ng-class="nodeClasses( node.id )"
          id="n{{node.id}}"
          cx="{{node.a[0]}}"
          cy="{{node.a[1]}}"

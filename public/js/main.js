@@ -40,8 +40,12 @@
         console.log( "Attempting to open as: " + JSON.stringify( options ) );
 
         this.createSocket();
-        this.socket.emit( "connect", options );
+        this.emit( "connect", options );
 
+    };
+
+    Connection.prototype.emit = function ( name, data ) {
+        return this.socket.emit( name, data );
     };
 
     Connection.prototype.setListener = function ( name, callback ) {
@@ -50,54 +54,6 @@
 
 
     var Peril = {};
-
-    Peril.Connection = new Connection();
-
-    Peril.SignIn = {};
-    Peril.SignIn.Controller = function ( $scope, $location ) {
-
-        console.log( "Starting SignIn controller" );
-
-        var my = this;
-
-        $scope.id = "";
-        $scope.room = "";
-        $scope.observer = false;
-        $scope.navigateTo = null;
-
-        $scope.$watch( "navigateTo", function () {
-            if ( null != $scope.navigateTo ) {
-                $location.path( $scope.navigateTo );
-            }
-        } );
-
-        $scope.$on( "$locationChangeStart", function ( event, newUrl, oldUrl ) {
-
-            console.log( "Navigating from " + oldUrl + " to " + newUrl );
-
-        } );
-
-        $scope.connect = function () {
-
-            Peril.Connection.setListener( "connected", function ( data ) {
-                console.log( "Attempting to reroute..." );
-                $scope.navigateTo = "/" + [ data.room, data.id ].join( "/" );
-                $scope.$apply();
-            } );
-
-            Peril.Connection.open( {
-                id: $scope.id,
-                room: $scope.room,
-                observer: $scope.observer
-            } );
-
-        };
-
-    };
-
-    Peril.Room = {};
-    Peril.Room.Controller = function ( $scope, $route ) {
-    };
 
     Peril.Map = {
 
@@ -316,9 +272,87 @@
 
     };
 
+
+    Peril.Connection = new Connection();
+
+
+    Peril.SignIn = {};
+    Peril.SignIn.Controller = function ( $scope, $location ) {
+
+        console.log( "Starting SignIn controller" );
+
+        var my = this;
+
+        $scope.id = "";
+        $scope.room = "";
+        $scope.observer = false;
+        $scope.navigateTo = null;
+
+        $scope.$watch( "navigateTo", function () {
+            if ( null != $scope.navigateTo ) {
+                $location.path( $scope.navigateTo );
+            }
+        } );
+
+        $scope.$on( "$locationChangeStart", function ( event, newUrl, oldUrl ) {
+
+            console.log( "Navigating from " + oldUrl + " to " + newUrl );
+
+        } );
+
+        $scope.connect = function () {
+
+            Peril.Connection.setListener( "connected", function ( data ) {
+                console.log( "Attempting to reroute..." );
+                $scope.navigateTo = "/" + [ data.room, data.id ].join( "/" );
+                $scope.$apply();
+            } );
+
+            Peril.Connection.open( {
+                id: $scope.id,
+                room: $scope.room,
+                observer: $scope.observer
+            } );
+
+        };
+
+    };
+
+
+    Peril.Room = {};
+    Peril.Room.Controller = function ( $scope, $route ) {
+
+        $scope.id = $route.current.params.id;
+        $scope.room = $route.current.params.room;
+
+        if ( null == Peril.Connection.socket ) {
+
+            Peril.Connection.open( {
+                id: $scope.id,
+                room: $scope.room
+            } );
+
+        }
+
+    };
+
+
     Peril.Map.Controller = function ( $scope ) {
 
         $scope.map = Peril.Map;
+        $scope.state = {};
+
+        $scope.nodeAction = function ( node_id ) {
+            Peril.Connection.emit( "acquire", { node: node_id } );
+        };
+
+        $scope.nodeClasses = function ( node_id ) {
+        };
+
+        Peril.Connection.setListener( "refresh", function ( data ) {
+            console.log( "Map controller refresh: " + JSON.stringify( data ) );
+            $scope.state = data;
+        } );
 
     };
 
@@ -330,7 +364,7 @@
 
         delete $httpProvider.defaults.headers.common["X-Requested-With"];
 
-        $routeProvider.when( "/:room/:client", {
+        $routeProvider.when( "/:room/:id", {
 
             controller: Peril.Room.Controller,
             templateUrl: "Peril.Room.template.html"

@@ -96,12 +96,14 @@ io.sockets.on(
         } );
 
         socket.on( "refresh", function ( data ) {
+            console.log( "Received refresh: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.refresh( socket.stash.client );
         } );
 
         // initial territory acquisition
         socket.on( "acquire", function ( data ) {
+            console.log( "Received acquire: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.acquire( socket.stash.client, data.node );
             game.refresh();
@@ -109,6 +111,7 @@ io.sockets.on(
 
         // deploy spare armies before battle
         socket.on( "deploy", function ( data ) {
+            console.log( "Received deploy: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( scoket.stash.client );
             game.deploy( socket.stash.client, data.node );
             game.refresh();
@@ -116,10 +119,12 @@ io.sockets.on(
 
         // redeem card sets
         socket.on( "redeem", function ( data ) {
+            console.log( "Received redeem: " + JSON.stringify( data || {} ) );
             //io.sockets.in( socket.stash.r ).emit( "update", update_data );
         } );
 
         socket.on( "attack", function ( data ) {
+            console.log( "Received attack: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.attack( {
                 client: socket.stash.client,
@@ -130,6 +135,7 @@ io.sockets.on(
         } );
 
         socket.on( "defend", function ( data ) {
+            console.log( "Received defend: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.defend( {
                 client: socket.stash.client,
@@ -140,6 +146,7 @@ io.sockets.on(
 
         // successful capture of node
         socket.on( "occupy", function ( data ) {
+            console.log( "Received occupy: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.occupy( {
                 client: socket.stash.client,
@@ -152,6 +159,7 @@ io.sockets.on(
 
         // end of turn army arrangement
         socket.on( "fortify", function ( data ) {
+            console.log( "Received fortify: " + JSON.stringify( data || {} ) );
             var game = Peril.Rooms.game( socket.stash.client );
             game.fortify( {
                 client: socket.stash.client,
