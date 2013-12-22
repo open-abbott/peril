@@ -14,32 +14,85 @@
             stroke-opacity: 1;
         }
 
+        g#nodes > g > circle.player-red {
+            fill: #ff8080;
+        }
+
+        g#nodes > g > circle.player-blue {
+            fill: #8080ff;
+        }
+
+        g#nodes > g > circle.player-yellow {
+            fill: #ffff99;
+        }
+
+        g#nodes > g > circle.player-black {
+            fill: #000;
+        }
+
+        g#nodes > g > circle.player-green {
+            fill: #80ff80;
+        }
+
+        g#nodes > g > circle.player-brown {
+            fill: #b89470;
+        }
+
         g#c1 > circle {
             fill: #ffe6ba;
+        }
+
+        g#c1 > circle.owned {
+            stroke: #ffe6ba;
         }
 
         g#c2 > circle {
             fill: #e7ffe0;
         }
 
+        g#c2 > circle.owned {
+            stroke: #e7ffe0;
+        }
+
         g#c3 > circle {
             fill: #ffdbff;
+        }
+
+        g#c3 > circle.owned {
+            stroke: #ffdbff;
         }
 
         g#c4 > circle {
             fill: #dee8ff;
         }
 
+        g#c4 > circle.owned {
+            stroke: #dee8ff;
+        }
+
         g#c5 > circle {
             fill: #fff0a4;
+        }
+
+        g#c5 > circle.owned {
+            stroke: #fff0a4;
         }
 
         g#c6 > circle {
             fill: #d8ffff;
         }
 
-        g#nodes > g > circle.selected {
-            fill: #fff;
+        g#c6 > circle.owned {
+            stroke: #d8ffff;
+        }
+
+        g#nodes > g > circle.selectable {
+            cursor: pointer;
+        }
+
+        g#nodes > g > circle.selectable:hover {
+            stroke: #ccc;
+            fill: #bbb;
         }
 
         g#edges > line {

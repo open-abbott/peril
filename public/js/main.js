@@ -342,18 +342,42 @@
     Peril.Map.Controller = function ( $scope ) {
 
         $scope.map = Peril.Map;
-        $scope.state = {};
+        $scope.state = null;
 
         $scope.nodeAction = function ( node_id ) {
             Peril.Connection.emit( "acquire", { node: node_id } );
         };
 
         $scope.nodeClasses = function ( node_id ) {
+
+            if (    null == $scope.state
+                 || null == $scope.state.nodes
+                 || null == $scope.state.nodes[node_id]) {
+                return;
+            }
+
+            var classes = [];
+
+            var owner = $scope.state.nodes[node_id].owner;
+
+            if ( null == owner ) {
+                if ( $scope.state.player.id == $scope.state.currentPlayer ) {
+                    classes.push( "selectable" );
+                }
+            }
+            else {
+                classes.push( "owned" );
+                classes.push( "player-" + $scope.state.players[ owner ].color );
+            }
+
+            return classes.join( " " );
+
         };
 
         Peril.Connection.setListener( "refresh", function ( data ) {
             console.log( "Map controller refresh: " + JSON.stringify( data ) );
             $scope.state = data;
+            $scope.$apply();
         } );
 
     };
