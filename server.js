@@ -92,10 +92,9 @@ io.sockets.on(
                 return;
             }
 
-            Peril.Rooms.part( socket.stash.client );
-                
             // if game not over, concede
             // emit refresh
+            Peril.Rooms.part( socket.stash.client );
         } );
 
         socket.on( "refresh", function ( data ) {
