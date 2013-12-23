@@ -24,9 +24,12 @@
             "gameOver"
         ];
 
-        function make_event_handler( name ) {
+        function make_event_handler( name, data ) {
             return function () {
-                console.log( "Client event received: " + name );
+                console.log(
+                    "Client event received - "
+                    + name + ": " + JSON.stringify( data || {} )
+                );
                 my.listeners[name] && my.listeners[name].apply( null, arguments );
             };
         }
@@ -284,10 +287,10 @@
 
         var my = this;
 
-        $scope.id = "";
-        $scope.room = "";
+        $scope.id = "dave";
+        $scope.room = "test";
         $scope.observer = false;
-        $scope.playerCount = 6;
+        $scope.playerCount = 2;
         $scope.playerCountOptions = [ 2, 3, 4, 5, 6 ];
         $scope.navigateTo = null;
 
@@ -337,11 +340,32 @@
 
     Peril.Map.Controller = function ( $scope ) {
 
+        var my = this;
+
         $scope.map = Peril.Map;
         $scope.state = null;
 
         $scope.nodeAction = function ( node_id ) {
-            Peril.Connection.emit( "acquire", { node: node_id } );
+
+            if ( my.isCurrentPlayer() ) {
+
+                switch ( $scope.state.phase ) {
+
+                case "acquiring":
+                    Peril.Connection.emit( "acquire", { node: node_id } );
+                    break;
+
+                case "placing":
+                    Peril.Connection.emit( "deploy", { node: node_id, armies: 1 } );
+                    break;
+
+                default:
+                    break;
+
+                }
+
+            }
+
         };
 
         $scope.nodeClasses = function ( node_id ) {
@@ -353,21 +377,35 @@
             }
 
             var classes = [];
+            var node = $scope.state.nodes[node_id];
 
-            var owner = $scope.state.nodes[node_id].owner;
+            if ( null != node.owner ) {
+                classes.push( "owned" );
+                classes.push( "player-" + $scope.state.players[ node.owner ].color );
+            }
 
-            if ( null == owner ) {
-                if ( $scope.state.player.id == $scope.state.currentPlayer ) {
+            if ( my.isCurrentPlayer() ) {
+                if ( my.canAcquire( node ) || my.canFortify( node ) ) {
                     classes.push( "selectable" );
                 }
-            }
-            else {
-                classes.push( "owned" );
-                classes.push( "player-" + $scope.state.players[ owner ].color );
             }
 
             return classes.join( " " );
 
+        };
+
+        this.canAcquire = function ( node ) {
+            return null == node.owner;
+        };
+
+        this.canFortify = function ( node ) {
+            return node.owner == $scope.state.player.id;
+        };
+
+        this.isCurrentPlayer = function () {
+            return $scope.state
+                && $scope.state.player
+                && $scope.state.player.id == $scope.state.currentPlayer;
         };
 
         Peril.Connection.setListener( "refresh", function ( data ) {
