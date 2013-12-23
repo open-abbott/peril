@@ -1,11 +1,15 @@
-<div class="maximize"><div class="map-container"><peril-map
-       room="room"
-       client="client"
-       observer="isObserver" /></div>
-  <div class="tray-container">
-    <div class="tray">
+<div class="maximize">
+  <div id="map-outer-container">
+    <div id="map-aspect-container">
+      <div id="map-aspect-buffer"></div>
+      <div id="map-container"><peril-map room="room" client="client" observer="isObserver" /></div>
+    </div>
+  </div>
+  <div id="tray-container">
+    <div id="tray">
       <div>
         <div>
+          PERIL
         </div>
       </div>
     </div>
