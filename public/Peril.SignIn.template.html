@@ -1,24 +1,25 @@
-<div class="center">
+<div id="signin-outer-container" class="center">
   <div>
     <div id="signin">
       <h1>Peril Sign In</h1>
 
-      <label>ID</label>
-      <input ng-model="id" type="text" />
+      <div>
+        <label>ID</label>
+        <input ng-model="id" type="text" />
+      </div>
 
-      <label>Room</label>
-      <input ng-model="room" type="text" />
+      <div>
+        <label>Room</label>
+        <input ng-model="room" type="text" />
+      </div>
 
-      <label>As observer</label>
-      <input ng-model="observer" type="checkbox" />
+      <div>
+        <input ng-model="observer" type="checkbox" /> Observer only
+      </div>
 
-      <div ng-if="!observer">
+      <div>
         <label>Player count</label>
-        <input
-           ng-model="playerCount"
-           ng-minlength="1",
-           ng-pattern="/^\d+$/"
-           type="text" />
+        <select ng-model="playerCount" ng-options="i as i for i in playerCountOptions"></select>
       </div>
 
       <div class="button-set">

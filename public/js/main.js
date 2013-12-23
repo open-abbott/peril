@@ -287,19 +287,14 @@
         $scope.id = "";
         $scope.room = "";
         $scope.observer = false;
-        $scope.playerCount = 2;
+        $scope.playerCount = 6;
+        $scope.playerCountOptions = [ 2, 3, 4, 5, 6 ];
         $scope.navigateTo = null;
 
         $scope.$watch( "navigateTo", function () {
             if ( null != $scope.navigateTo ) {
                 $location.path( $scope.navigateTo );
             }
-        } );
-
-        $scope.$on( "$locationChangeStart", function ( event, newUrl, oldUrl ) {
-
-            console.log( "Navigating from " + oldUrl + " to " + newUrl );
-
         } );
 
         $scope.connect = function () {
