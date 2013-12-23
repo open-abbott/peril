@@ -113,7 +113,7 @@ io.sockets.on(
         // deploy spare armies before battle
         socket.on( "deploy", function ( data ) {
             console.log( "Received deploy: " + JSON.stringify( data || {} ) );
-            var game = Peril.Rooms.game( scoket.stash.client );
+            var game = Peril.Rooms.game( socket.stash.client );
             game.deploy( socket.stash.client, data.node, data.armies );
         } );
 
