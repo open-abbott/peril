@@ -351,6 +351,10 @@
 
                 switch ( $scope.state.phase ) {
 
+                case "main":
+                    my.prepareForTurn();
+                    break;
+
                 case "acquiring":
                     Peril.Connection.emit( "acquire", { node: node_id } );
                     break;
@@ -392,6 +396,12 @@
 
             return classes.join( " " );
 
+        };
+
+        this.prepareForTurn = function () {
+            // configure for deployment
+            // configure for attack
+            // configure for fortification
         };
 
         this.canAcquire = function ( node ) {
