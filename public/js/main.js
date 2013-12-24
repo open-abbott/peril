@@ -398,6 +398,11 @@
 
         };
 
+        $scope.isFalseNode = function ( id ) {
+            console.log( "isFalseNode: " + id );
+            return "0" == String( id ).charAt( 0 );
+        };
+
         this.prepareForTurn = function () {
             // configure for deployment
             // configure for attack

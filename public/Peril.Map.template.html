@@ -95,6 +95,14 @@
             fill: #bbb;
         }
 
+        g#nodes > g > text {
+            font-family: sans-serif;
+            font-size: 10pt;
+            fill: #000;
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
         g#edges > line {
             stroke: #000;
             stroke-opacity: 1;
@@ -127,6 +135,13 @@
          cx="{{node.a[0]}}"
          cy="{{node.a[1]}}"
          r="{{node.r}}" />
+
+      <text
+         ng-repeat="node in cluster.nodes"
+         ng-hide="isFalseNode( node.id )"
+         x="{{node.a[0]}}"
+         y="{{node.a[1]}}"
+         >{{state.nodes[node.id].armies || ""}}</text>
 
     </g>
 
