@@ -1,6 +1,8 @@
 ( function () {
 
     function Connection() {
+        this.id = null;
+        this.player = {};
         this.host = "http://daveabbott.com:9001";
         this.socket = null;
         this.listeners = {};
@@ -304,6 +306,7 @@
 
             Peril.Connection.setListener( "connected", function ( data ) {
                 console.log( "Attempting to reroute..." );
+                Peril.Connection.id = data.id;
                 $scope.navigateTo = "/" + [ data.room, data.id ].join( "/" );
                 $scope.$apply();
             } );
@@ -325,6 +328,19 @@
 
         $scope.id = $route.current.params.id;
         $scope.room = $route.current.params.room;
+        $scope.player = Peril.Connection.player;
+
+        $scope.roomClasses = function () {
+
+            var classes = [];
+
+            if ( $scope.player.color ) {
+                classes.push( "player-" + $scope.player.color );
+            }
+
+            return classes.join( " " );
+
+        };
 
         if ( null == Peril.Connection.socket ) {
 
@@ -423,9 +439,19 @@
         };
 
         Peril.Connection.setListener( "refresh", function ( data ) {
+
             console.log( "Map controller refresh: " + JSON.stringify( data ) );
             $scope.state = data;
+
+            if ( null != $scope.state.player && null == Peril.Connection.player.color ) {
+                angular.extend(
+                    Peril.Connection.player,
+                    $scope.state.players[$scope.state.player.id]
+                );
+            }
+
             $scope.$apply();
+
         } );
 
     };

@@ -118,7 +118,16 @@ html, body, div, svg {
 
 #tray-container {
     margin: 5px;
+    border: solid 1px #ccc;
+    border-radius: 4px;
 }
+
+.player-red #tray-container    { border: solid 1px #ff8080; }
+.player-blue #tray-container   { border: solid 1px #8080ff; }
+.player-yellow #tray-container { border: solid 1px #ffff99; }
+.player-black #tray-container  { border: solid 1px #000;    }
+.player-green #tray-container  { border: solid 1px #80ff80; }
+.player-brown #tray-container  { border: solid 1px #b89470; }
 
 #tray {
     display: table;
