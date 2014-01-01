@@ -166,5 +166,13 @@ io.sockets.on(
             } );
         } );
 
+        socket.on( "endTurn", function ( data ) {
+            console.log( "Received endTurn: " + JSON.stringify( data || {} ) );
+            var game = Peril.Rooms.game( socket.stash.client );
+            game.endTurn( {
+                client: socket.stash.client
+            } );
+        } );
+
     }
 );
