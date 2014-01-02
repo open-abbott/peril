@@ -3,7 +3,7 @@
     function Connection() {
         this.id = null;
         this.player = {};
-        this.host = "http://daveabbott.com:9001";
+        this.host = PERIL_URL;
         this.socket = null;
         this.listeners = {};
     };
