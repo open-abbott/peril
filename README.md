@@ -1,27 +1,23 @@
-PERIL
-=====
+# PERIL
 
 A game server and client written for Node.js based on the Risk board game and intended to be played by bots.
 
 
 
-About
------
+## About
 
 A friend of mine enjoys playing the Risk board game with his family.  Being hyper-nerds, we figured it'd be more fun to write bots to play the game for us.  This project is all about that idea.
 
 
 
-Requirements
-------------
+## Requirements
 
 - GIT
 - Node.js
 
 
 
-Getting Started
----------------
+## Getting Started
 
 1. Clone the repository.
 2. From within the repository, run: npm install
@@ -29,8 +25,7 @@ Getting Started
 
 
 
-Writing Clients
----------------
+## Writing Clients
 
 The repository comes with an interactive client that is served from the same port that the game server uses to communicate (9001, by default).
 
@@ -38,98 +33,84 @@ Other clients can (and ideally, should) be written.  The server uses web sockets
 
 
 
-Events
-------
+## Events
 
 All events are documented from the stance of the client.  If the event is of the request type, then the client is doing the requesting.  If the event is of the response type, the server is doing the responding.
 
 
-Name: connect
-
+### connect
 Type: request
 
 Connect a game client to the server.  The server will respond with either a connected or disconnected response.
 
 
-Name: connected
-
+### connected
 Type: response
 
 If the server responds with a connected response, your client is connected.
 
 
-Name: disconnected
-
+### disconnected
 Type: response
 
 If the server responds with a disconnected response, your client is disconnected
 
 
-Name: refresh
-
+### refresh
 Type: request/response
 
 A client may request a refresh event be sent.  Response provides a snapshot of the game state.
 
 
-Name: acquire
-
+### acquire
 Type: request/response
 
 The server will indicate that the client should issue an acquire event.
 
 
-Name: deploy
-
+### deploy
 Type: request/response
 
 The server will indicate that the client should issue a deploy event.
 
 
-Name: redeem
-
+### redeem
 Type: request
 
 The client may issue a redeem request to convert cards to armies at appropriate junctures.
 
 
-Name: attack
-
+### attack
 Type: request
 
 The client may issue an attack request at appropriate junctures.
 
 
-Name: defend
-
+### defend
 Type: request/response
 
 The server will emit a defend event to inform the client that it should provide a defense event.
 
 
-Name: occupy
-
+### occupy
 Type: request/response
 
 Upon successful attack, the server will inform the client that it should provide an occupy event.
 
 
-Name: fortify
-
+### fortify
 Type: request
 
 The client may choose to emit fortify event(s) at the end if its turn.
 
 
-Name: endTurn
-
+### endTurn
 Type: request
 
 The client should emit an endTurn event when their turn is complete.
 
 
-Name: gameOver
-
+### gameOver
 Type: response
 
 The server will emit a gameOver event when the game has come to conclusion.
