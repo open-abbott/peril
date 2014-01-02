@@ -45,67 +45,93 @@ All events are documented from the stance of the client.  If the event is of the
 
 
 Name: connect
+
 Type: request
+
 Connect a game client to the server.  The server will respond with either a connected or disconnected response.
 
 
 Name: connected
+
 Type: response
+
 If the server responds with a connected response, your client is connected.
 
 
 Name: disconnected
+
 Type: response
+
 If the server responds with a disconnected response, your client is disconnected
 
 
 Name: refresh
+
 Type: request/response
+
 A client may request a refresh event be sent.  Response provides a snapshot of the game state.
 
 
 Name: acquire
+
 Type: request/response
+
 The server will indicate that the client should issue an acquire event.
 
 
 Name: deploy
+
 Type: request/response
+
 The server will indicate that the client should issue a deploy event.
 
 
 Name: redeem
+
 Type: request
+
 The client may issue a redeem request to convert cards to armies at appropriate junctures.
 
 
 Name: attack
+
 Type: request
+
 The client may issue an attack request at appropriate junctures.
 
 
 Name: defend
+
 Type: request/response
+
 The server will emit a defend event to inform the client that it should provide a defense event.
 
 
 Name: occupy
+
 Type: request/response
+
 Upon successful attack, the server will inform the client that it should provide an occupy event.
 
 
 Name: fortify
+
 Type: request
+
 The client may choose to emit fortify event(s) at the end if its turn.
 
 
 Name: endTurn
+
 Type: request
+
 The client should emit an endTurn event when their turn is complete.
 
 
 Name: gameOver
+
 Type: response
+
 The server will emit a gameOver event when the game has come to conclusion.
 
 This may occur when a player-client disconnects or if one player-client owns all nodes.
