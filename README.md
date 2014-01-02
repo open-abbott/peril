@@ -26,15 +26,18 @@ the game for us.  This project is all about that idea.
 
 2. From within the repository, run: npm install
 
-3. Create a file in the repository, public/js/custom.js.  Populate
+4. From within the repository, run: node server.js
+
+
+### Using the Built-In Client
+
+Create a file in the repository, public/js/custom.js.  Populate
 this file with a line to specify the host and port where your server
 will respond as in the following example.
 
 ```
 PERIL_URL = "http://localhost:9001";
 ```
-
-4. From within the repository, run: node server.js
 
 
 
