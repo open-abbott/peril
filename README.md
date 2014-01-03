@@ -36,7 +36,7 @@ this file with a line to specify the host and port where your server
 will respond as in the following example.
 
 ```
-PERIL_URL = "http://localhost:9001";
+var PERIL_URL = "http://localhost:9001";
 ```
 
 
