@@ -324,11 +324,14 @@
 
 
     Peril.Room = {};
-    Peril.Room.Controller = function ( $scope, $route ) {
+    Peril.Room.Controller = function ( $scope, $route, $rootScope ) {
+
+        var my = this;
 
         $scope.id = $route.current.params.id;
         $scope.room = $route.current.params.room;
         $scope.player = Peril.Connection.player;
+        $scope.state = null;
 
         $scope.roomClasses = function () {
 
@@ -351,17 +354,9 @@
 
         }
 
-    };
+        var click_listener_unbind = $rootScope.$on( "nodeClick", function ( event, data ) {
 
-
-    Peril.Map.Controller = function ( $scope ) {
-
-        var my = this;
-
-        $scope.map = Peril.Map;
-        $scope.state = null;
-
-        $scope.nodeAction = function ( node_id ) {
+            console.log( "Room captured click event: " + JSON.stringify( data ) );
 
             if ( my.isCurrentPlayer() ) {
 
@@ -372,11 +367,12 @@
                     break;
 
                 case "acquiring":
-                    Peril.Connection.emit( "acquire", { node: node_id } );
+                    Peril.Connection.emit( "acquire", data );
                     break;
 
                 case "placing":
-                    Peril.Connection.emit( "deploy", { node: node_id, armies: 1 } );
+                    data.armies = 1;
+                    Peril.Connection.emit( "deploy", data );
                     break;
 
                 default:
@@ -386,6 +382,51 @@
 
             }
 
+            event.stopPropagation();
+
+        } );
+        $scope.$on( "$destroy", click_listener_unbind );
+
+        this.isCurrentPlayer = function () {
+            return $scope.state
+                && $scope.state.player
+                && $scope.state.player.id == $scope.state.currentPlayer;
+        };
+
+        this.prepareForTurn = function () {
+            // configure for deployment
+            // configure for attack
+            // configure for fortification
+        };
+
+        Peril.Connection.setListener( "refresh", function ( data ) {
+
+            console.log( "Room controller refresh: " + JSON.stringify( data ) );
+            $scope.state = data;
+
+            if ( null != $scope.state.player && null == Peril.Connection.player.color ) {
+                angular.extend(
+                    Peril.Connection.player,
+                    $scope.state.players[$scope.state.player.id]
+                );
+            }
+
+            $scope.$apply();
+
+        } );
+
+    };
+
+
+    Peril.Map.Controller = function ( $scope, $rootScope ) {
+
+        var my = this;
+
+        $scope.map = Peril.Map;
+
+        $scope.clickNode = function ( node_id ) {
+            console.log( "Clicked: " + node_id );
+            $rootScope.$emit( "nodeClick", { node: node_id } );
         };
 
         $scope.nodeClasses = function ( node_id ) {
@@ -418,12 +459,6 @@
             return "0" == String( id ).charAt( 0 );
         };
 
-        this.prepareForTurn = function () {
-            // configure for deployment
-            // configure for attack
-            // configure for fortification
-        };
-
         this.canAcquire = function ( node ) {
             return null == node.owner;
         };
@@ -437,22 +472,6 @@
                 && $scope.state.player
                 && $scope.state.player.id == $scope.state.currentPlayer;
         };
-
-        Peril.Connection.setListener( "refresh", function ( data ) {
-
-            console.log( "Map controller refresh: " + JSON.stringify( data ) );
-            $scope.state = data;
-
-            if ( null != $scope.state.player && null == Peril.Connection.player.color ) {
-                angular.extend(
-                    Peril.Connection.player,
-                    $scope.state.players[$scope.state.player.id]
-                );
-            }
-
-            $scope.$apply();
-
-        } );
 
     };
 
@@ -483,9 +502,7 @@
             return {
                 restrict: "E",
                 scope: {
-                    room: "=",
-                    client: "=",
-                    isObserver: "=observer"
+                    state: "="
                 },
                 controller: Peril.Map.Controller,
                 templateUrl: "Peril.Map.template.html",
