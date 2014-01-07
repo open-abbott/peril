@@ -73,6 +73,7 @@ io.sockets.on(
                 };
                 console.log( "Disconnecting duplicate client " + socket.stash.client.getID() );
                 socket.emit( "disconnected", disconnected_data );
+                socket.disconnect();
                 return;
             }
 

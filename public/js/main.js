@@ -62,6 +62,13 @@
         this.listeners[name] = callback;
     };
 
+    Connection.prototype.reset = function () {
+        this.id = null;
+        this.player = {};
+        this.socket = null;
+        this.listeners = {};
+    };
+
 
     var Peril = {};
 
@@ -313,6 +320,12 @@
                 Peril.Connection.id = data.id;
                 $scope.navigateTo = "/" + [ data.room, data.id ].join( "/" );
                 $scope.$apply();
+            } );
+
+            Peril.Connection.setListener( "disconnected", function ( data ) {
+                console.log( "Disconnected" );
+                Peril.Connection.reset();
+                $scope.connect();
             } );
 
             Peril.Connection.open( {
