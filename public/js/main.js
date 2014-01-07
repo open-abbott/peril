@@ -54,6 +54,10 @@
         return this.socket.emit( name, data );
     };
 
+    Connection.prototype.refresh = function () {
+        return this.emit( "refresh" );
+    };
+
     Connection.prototype.setListener = function ( name, callback ) {
         this.listeners[name] = callback;
     };
@@ -414,6 +418,7 @@
             $scope.$apply();
 
         } );
+        Peril.Connection.refresh();
 
     };
 
