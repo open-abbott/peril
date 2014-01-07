@@ -39,6 +39,9 @@ will respond as in the following example.
 var PERIL_URL = "http://localhost:9001";
 ```
 
+The built-in client also supports connecting as an observer.  An
+observer client receives game refreshes, but is not allowed to
+interact with the game.
 
 
 ## Writing Clients
@@ -68,12 +71,36 @@ Type: request
 Connect a game client to the server.  The server will respond with
 either a connected or disconnected response.
 
+#### Payload example
+In this example...
+- requested client name/ID is "Fred"
+- requested room is "101"
+- client wishes to be a player
+- if client is first player, it will set max players to 4
+
+```
+{
+    "id": "Fred",
+    "room": "101",
+    "observer": false,
+    "playerCount": 4
+}
+```
+
 
 ### connected
 Type: response
 
 If the server responds with a connected response, your client is
 connected.
+
+#### Payload example
+```
+{
+    "id": "Fred",
+    "room": "101"
+}
+```
 
 
 ### disconnected
@@ -82,12 +109,61 @@ Type: response
 If the server responds with a disconnected response, your client is
 disconnected
 
+#### Payload example
+```
+{
+    "message": "A client already exists with that identity"
+}
+```
+
 
 ### refresh
 Type: request/response
 
 A client may request a refresh event be sent.  Response provides a
-snapshot of the game state.
+snapshot of the game state.  If the client is also a player and the
+current player, the player's state will be added to the response.
+
+#### Request payload example
+None.
+
+#### Response payload examples In the following example, the current
+player is "player2", and we are viewing as that player.  This is
+during the territory aquisition phase of the game.  "player3" has
+already claimed South Africa, but Congo is unclaimed.
+
+```
+{
+    "nodes": {
+        "10": {
+            "name": "South Africa",
+            "armies": 1,
+            "owner": "player3"
+        },
+        "11": {
+            "name": "Congo",
+        },
+        .
+        .
+        .
+    },
+    "phase": "acquiring",
+    "currentPlayer": "player2",
+    "players": {
+        "player1": { "color": "red" },
+        "player2": { "color": "blue" },
+        "player3": { "color": "yellow" },
+        "player4": { "color": "black" }
+    },
+    "player": {
+        "id": "player2",
+        "armies": 1,
+        "cards": [],
+        "startingArmies": 27
+    },
+    "sequence": 61
+}
+```
 
 
 ### acquire
@@ -95,6 +171,19 @@ Type: request/response
 
 The server will indicate that the client should issue an acquire
 event.
+
+#### Request payload example If it is the players turn to acquire a
+territory, the request simply indicates the ID of the territory to
+acquire.
+
+```
+{
+    "node": "11"
+}
+```
+
+#### Response payload example
+None.
 
 
 ### deploy
@@ -150,3 +239,10 @@ conclusion.
 
 This may occur when a player-client disconnects or if one
 player-client owns all nodes.
+
+
+### error
+Type: response
+
+If the client attempts to perform an action in an invalid way, an
+error response will be emitted.
