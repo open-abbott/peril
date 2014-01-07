@@ -71,7 +71,8 @@ Type: request
 Connect a game client to the server.  The server will respond with
 either a connected or disconnected response.
 
-_Payload example_
+__Payload example__
+
 In this example...
 - requested client name/ID is "Fred"
 - requested room is "101"
@@ -94,7 +95,8 @@ Type: response
 If the server responds with a connected response, your client is
 connected.
 
-_Payload example_
+__Payload example__
+
 ```
 {
     "id": "Fred",
@@ -109,7 +111,8 @@ Type: response
 If the server responds with a disconnected response, your client is
 disconnected
 
-_Payload example_
+__Payload example__
+
 ```
 {
     "message": "A client already exists with that identity"
@@ -124,10 +127,12 @@ A client may request a refresh event be sent.  Response provides a
 snapshot of the game state.  If the client is also a player and the
 current player, the player's state will be added to the response.
 
-_Request payload example_
+__Request payload example__
+
 None.
 
-_Response payload examples_
+__Response payload examples__
+
  In the following example, the current player is "player2", and we are
 viewing as that player.  This is during the territory aquisition phase
 of the game.  "player3" has already claimed South Africa, but Congo is
