@@ -71,7 +71,7 @@ Type: request
 Connect a game client to the server.  The server will respond with
 either a connected or disconnected response.
 
-#### Payload example
+_Payload example_
 In this example...
 - requested client name/ID is "Fred"
 - requested room is "101"
@@ -94,7 +94,7 @@ Type: response
 If the server responds with a connected response, your client is
 connected.
 
-#### Payload example
+_Payload example_
 ```
 {
     "id": "Fred",
@@ -109,7 +109,7 @@ Type: response
 If the server responds with a disconnected response, your client is
 disconnected
 
-#### Payload example
+_Payload example_
 ```
 {
     "message": "A client already exists with that identity"
@@ -124,13 +124,14 @@ A client may request a refresh event be sent.  Response provides a
 snapshot of the game state.  If the client is also a player and the
 current player, the player's state will be added to the response.
 
-#### Request payload example
+_Request payload example_
 None.
 
-#### Response payload examples In the following example, the current
-player is "player2", and we are viewing as that player.  This is
-during the territory aquisition phase of the game.  "player3" has
-already claimed South Africa, but Congo is unclaimed.
+_Response payload examples_
+ In the following example, the current player is "player2", and we are
+viewing as that player.  This is during the territory aquisition phase
+of the game.  "player3" has already claimed South Africa, but Congo is
+unclaimed.
 
 ```
 {
@@ -172,9 +173,9 @@ Type: request/response
 The server will indicate that the client should issue an acquire
 event.
 
-#### Request payload example If it is the players turn to acquire a
-territory, the request simply indicates the ID of the territory to
-acquire.
+_Request payload example_
+ If it is the players turn to acquire a territory, the request simply
+indicates the ID of the territory to acquire.
 
 ```
 {
@@ -182,7 +183,7 @@ acquire.
 }
 ```
 
-#### Response payload example
+_Response payload example_
 None.
 
 
