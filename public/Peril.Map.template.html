@@ -118,10 +118,10 @@
 
     <line
        ng-repeat="edge in map.edges"
-       x1="{{map.clusters[edge.a.c].nodes[edge.a.n].a[0]}}"
-       y1="{{map.clusters[edge.a.c].nodes[edge.a.n].a[1]}}"
-       x2="{{map.clusters[edge.b.c].nodes[edge.b.n].a[0]}}"
-       y2="{{map.clusters[edge.b.c].nodes[edge.b.n].a[1]}}" />
+       ng-attr-x1="{{map.clusters[edge.a.c].nodes[edge.a.n].a[0]}}"
+       ng-attr-y1="{{map.clusters[edge.a.c].nodes[edge.a.n].a[1]}}"
+       ng-attr-x2="{{map.clusters[edge.b.c].nodes[edge.b.n].a[0]}}"
+       ng-attr-y2="{{map.clusters[edge.b.c].nodes[edge.b.n].a[1]}}" />
 
   </g>
 
@@ -134,15 +134,15 @@
          ng-click="clickNode( node.id )"
          ng-class="nodeClasses( node.id )"
          id="n{{node.id}}"
-         cx="{{node.a[0]}}"
-         cy="{{node.a[1]}}"
-         r="{{node.r}}" />
+         ng-attr-cx="{{node.a[0]}}"
+         ng-attr-cy="{{node.a[1]}}"
+         ng-attr-r="{{node.r}}" />
 
       <text
          ng-repeat="node in cluster.nodes"
          ng-hide="isFalseNode( node.id )"
-         x="{{node.a[0]}}"
-         y="{{node.a[1]}}"
+         ng-attr-x="{{node.a[0]}}"
+         ng-attr-y="{{node.a[1]}}"
          >{{state.nodes[node.id].armies || ""}}</text>
 
     </g>
