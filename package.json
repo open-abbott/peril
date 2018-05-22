@@ -1,10 +1,23 @@
 {
-    "name": "peril",
-    "description": "Peril",
-    "version": "0.0.1",
-    "dependencies": {
-        "node-static": "*",
-        "socket.io": "*"
-    }
+  "name": "peril",
+  "description": "Peril",
+  "homepage": "https://github.com/open-abbott/peril#readme",
+  "author": {
+    "name": "John Abbott",
+    "email": "dave@daveabbott.com",
+    "url": "http://daveabbott.com"
+  },
+  "repository": "github:open-abbott/peril",
+  "license": "MIT",
+  "version": "1.0.0-dev",
+  "dependencies": {
+    "coa": "2.0.1",
+    "extend": "3.0.1",
+    "node-static": "0.7.10",
+    "q": "2.0.3",
+    "socket.io": "2.1.1"
+  },
+  "bin": {
+    "peril-server": "bin/peril-server"
+  }
 }
-

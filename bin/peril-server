@@ -1,0 +1,34 @@
+#!/usr/bin/env node
+'use strict'
+
+const config = require('../lib/config/config')
+const packageJson = require('../package.json')
+const process = require('process')
+const server = require('../lib/server/server')
+
+const cli = require('coa')
+    .Cmd()
+    .name(packageJson.name)
+    .title(packageJson.description)
+    .helpful()
+
+cli.opt()
+    .name('configFilename')
+    .long('config')
+    .title('Optional configuration filename')
+    .end()
+
+cli.act((opts, args) => {
+    return config.fromCli(opts, args)
+        .then(() => server.start())
+        .then(() => {
+            console.log('Done')
+            process.exit(0)
+        })
+        .catch(error => {
+            console.error(error.stack)
+            process.exit(-1)
+        })
+})
+
+cli.run()
